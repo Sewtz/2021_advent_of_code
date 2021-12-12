@@ -1,5 +1,3 @@
-from os import pardir
-
 file = "input.txt"
 
 def main():
