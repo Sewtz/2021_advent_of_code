@@ -3,12 +3,12 @@ import numpy as np
 
 from graph import Graph
 
-file = "example.txt"
+file = "input.txt"
 
 def main():
     map = read_file(file)
+    map = expand_map(map, 5)
 
-    # part 1
     graph_list = {}
     for x in range(map.shape[0]):
         for y in range(map.shape[1]):
@@ -31,22 +31,24 @@ def main():
     render[0,0] = 0
 
     print(sum(sum(render)))
-    
-
-    # part 2
-    map = expand_map(map, 5)
-    print(expand_map(np.ones((2,2)), 5))
 
 def expand_map(map, times):
-    new_map = map.copy()
-    for t in range(times):
-        new_tile = map + np.ones_like(map) * t
-        new_map  = np.concatenate((new_map, new_tile), axis=0)
+    new_map = np.zeros((map.shape[0] * times, map.shape[1] * times))
+    tile = map.copy()
+    new_map[0:map.shape[0], 0:map.shape[1]] = map
+    for r in range(1,times):
+        c = 0
+        new_tile = new_map[map.shape[0]*(r-1):map.shape[0]*r, 0:map.shape[1]].copy()
+        new_tile += np.ones_like(new_tile)
+        new_tile[new_tile>9] = 1
+        new_map[map.shape[0]*r:map.shape[0]*(r+1), 0:map.shape[1]] = new_tile
+    for c in range(1,times):
+        r = 0
+        new_tile = new_map[0:new_map.shape[0], map.shape[1]*(c-1):map.shape[1]*c].copy()
+        new_tile += np.ones_like(new_tile)
+        new_tile[new_tile>9] = 1
+        new_map[0:new_map.shape[0], map.shape[1]*(c):map.shape[1]*(c+1)] = new_tile
 
-    inter_map = new_map.copy()
-    for t in range(times):
-        new_tile = inter_map + np.ones_like(inter_map) * t
-        new_map  = np.concatenate((new_map, new_tile), axis=1)
 
     return new_map
 
