@@ -9,7 +9,7 @@ def main():
 
     # iterate over every packet
     for packet in [hex2bin(input)]:
-        res, rb = parse_packet(packet)
+        res, _ = parse_packet(packet)
         print(res)
     
     #print(version_sum)
@@ -20,17 +20,16 @@ def read_file(file):
 
 def parse_packet(packet):
     global version_sum
-    v,t,l,p = split_packet(packet)
+    v,t,_,_ = split_packet(packet)
 
     # add to version sum
     version_sum += v
     if t == 4:
-        res, rb = parse_literal_value(packet)
-        
+        result, read_bits = parse_literal_value(packet)        
     else:
-        res, rb = parse_operator(packet)
+        result, read_bits = parse_operator(packet)
 
-    return res, rb
+    return result, read_bits
 
 def parse_literal_value(packet):
     _,_,_,payload = split_packet(packet)
