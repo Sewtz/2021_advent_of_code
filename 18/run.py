@@ -1,41 +1,52 @@
 import math
 
+step = 0
 def main():
+    global step
     number = ""
     for line in read_file("example.txt"):
+        step += 1
         line = line.replace("\n", "")
 
         if number == "":
-            number = reduce_number(line)
+            number = line
         else:
-            number = "[" + number + "," + reduce_number(line) + "]"
+            number = "[" + number + "," + line + "]"
+
+        #print("--")
+        #print(number)
+        print(step)
+        number = reduce_number(number, step==2)
+        #print(number)
     
     print(number)
-    print(reduce_number(number))
 
 def read_file(file):
     with open(file, "r") as fp:
         return fp.readlines()
 
-def reduce_number(number):
+def reduce_number(number, debug=False):
+    step   = 0
     while(True):
         # first explode
         new_number = explode(number)
         if new_number != number:
-            print("e")
-            print(number)
-            print(new_number)
-            print("++")
+            if debug:
+                print("e")
+                print(number)
+                print(new_number)
+                print("++")
             number = new_number
             continue
 
         # then split
         new_number = split(number)
         if new_number != number:
-            print("s")
-            print(number)
-            print(new_number)
-            print("++")
+            if debug:
+                print("s")
+                print(number)
+                print(new_number)
+                print("++")
             number = new_number
             continue
 
@@ -44,7 +55,8 @@ def reduce_number(number):
 
 def explode(number):
     # remove artifacts
-    number = number.replace("[0]", "0")
+    if "[0]" in number:
+        return number.replace("[0]", "0")
 
     new_number = ""
     last_num   = None
@@ -72,24 +84,10 @@ def explode(number):
         else:
             # extract [a,b]
             separator_idx = number.find(",", i)
-            closing_idx   = separator_idx
-
-            # find corresponding closing bracket
-            levels_of_brackets = 0
-            for n in range(separator_idx, len(number)):
-                if number[n] == "[":
-                    levels_of_brackets += 1
-                elif number[n] == "]":
-                    closing_idx = n+1
-                    levels_of_brackets -=1
-
-                    if levels_of_brackets == 0:
-                        break
+            closing_idx   = number.find("]", separator_idx)
 
             a = number[i:separator_idx]
             b = number[separator_idx+1:closing_idx]
-            print(separator_idx, closing_idx)
-            print("--",a,b)
 
             # add to left
             if not last_num is None:
@@ -164,7 +162,6 @@ def split(number):
 
             # now split
             value  = int(num)
-            print(value)
             a      = str(math.floor(value/2.))
             b      = str(math.ceil(value/2.))
             result = "[" + a + "," + b + "]"
